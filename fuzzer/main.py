@@ -1,112 +1,175 @@
-import os, subprocess, sysv_ipc, random, time
+import os
+import subprocess
+import sysv_ipc
+import random
+import time
 
+# --- 配置参数 ---
 TARGET = "/app/target/target_instrumented"
 MAP_SIZE = 65536
+SEED_DIR = "/app/seeds"
+OUT_DIR = "/app/out"
 
 
 class GreyBoxFuzzer:
     def __init__(self, target_path):
         self.target_path = target_path
-        # 1. 初始化共享内存
-        self.shm = sysv_ipc.SharedMemory(None, flags=sysv_ipc.IPC_CREAT | sysv_ipc.IPC_EXCL, mode=0o600, size=MAP_SIZE)
+
+        # 1. 建立共享内存 (SHM)
+        # 与 AFL 类似，我们使用 sysv_ipc 来开辟内存空间，供 C 程序写入覆盖率
+        try:
+            self.shm = sysv_ipc.SharedMemory(None, flags=sysv_ipc.IPC_CREAT | sysv_ipc.IPC_EXCL, mode=0o600,
+                                             size=MAP_SIZE)
+        except sysv_ipc.ExistentialError:
+            # 如果清理不当导致已存在，则报错，通常需要手动清理或重启
+            print("[!] SHM 已存在，请清理。")
+            exit(1)
+
         self.env = os.environ.copy()
         self.env["__AFL_SHM_ID"] = str(self.shm.id)
 
-        # 2. 核心：全局位图索引记录（记录所有见过的“边”）
-        self.global_visited_indices = set()
+        # 2. 状态跟踪
         self.corpus = []
+        self.global_visited_indices = set()
         self.exec_count = 0
         self.start_time = time.time()
 
-        # 3. 加载种子
-        if not os.path.exists("/app/seeds"): os.makedirs("/app/seeds")
-        for f in os.listdir("/app/seeds"):
-            with open(os.path.join("/app/seeds", f), "rb") as bio:
-                self.corpus.append(bio.read())
-        if not self.corpus: self.corpus = [b"a"]
+        # 3. 初始化语料库 (Corpus)
+        if not os.path.exists(SEED_DIR):
+            os.makedirs(SEED_DIR)
+
+        for filename in os.listdir(SEED_DIR):
+            file_path = os.path.join(SEED_DIR, filename)
+            if os.path.isfile(file_path):
+                with open(file_path, "rb") as f:
+                    self.corpus.append(f.read())
+
+        if not self.corpus:
+            self.corpus = [b"a"]  # 基础种子
+
+        self.stats_file = "/app/out/fuzz_stats.csv"
+        with open(self.stats_file, "w") as f:
+            f.write("timestamp,exec_count,coverage\n")
 
     def mutate(self, data):
-        """温和变异：确保更有可能保留已有的正确前缀"""
+        """变异算法：混合了确定性变异和随机破坏"""
         res = bytearray(data)
-        if not res: return b"a"
+        if not res: res = bytearray(b"a")
 
-        # 随机选择一种变异方式
-        choice = random.random()
-        idx = random.randint(0, len(res) - 1)
+        # 变异强度：随机决定变异几次
+        iterations = random.randint(1, 8)
 
-        if choice < 0.4:  # 40% 概率：位翻转
-            res[idx] ^= (1 << random.randint(0, 7))
-        elif choice < 0.7:  # 30% 概率：算术微调 (+1 或 -1)
-            res[idx] = (res[idx] + random.choice([-1, 1])) % 256
-        elif choice < 0.9:  # 20% 概率：插入/删除
-            if random.random() > 0.5:
-                res.insert(idx, random.randint(32, 126))
-            elif len(res) > 1:
-                res.pop(idx)
-        else:  # 10% 概率：替换为有趣字符
-            res[idx] = ord(random.choice("crash123\x00\xff"))
+        for _ in range(iterations):
+            idx = random.randint(0, len(res) - 1)
+            choice = random.random()
+
+            if choice < 0.3:
+                # 1. 位翻转 (Bitflip)
+                res[idx] ^= (1 << random.randint(0, 7))
+            elif choice < 0.6:
+                # 2. 算术微调 (Arithmetic)
+                delta = random.choice([-1, 1])
+                res[idx] = (res[idx] + delta) % 256
+            elif choice < 0.8:
+                # 3. 结构变异 (Insertion/Deletion)
+                if random.random() > 0.5:
+                    res.insert(idx, random.randint(32, 126))
+                elif len(res) > 1:
+                    res.pop(idx)
+            else:
+                # 4. 字典/魔数注入 (Interesting Values)
+                interesting = [0, 1, 255, ord('c'), ord('r'), ord('a'), ord('s'), ord('h')]
+                res[idx] = random.choice(interesting)
 
         return bytes(res)
 
     def run_target(self, input_data):
-        self.shm.write(b'\x00' * MAP_SIZE)  # 清空白板
-        proc = subprocess.Popen([self.target_path], stdin=subprocess.PIPE,
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=self.env)
-        try:
-            proc.communicate(input=input_data, timeout=0.1)
-        except subprocess.TimeoutExpired:
-            proc.kill();
-            proc.wait()
-            return set(), 0
+        """执行目标程序并获取覆盖率反馈"""
+        # 每次运行前清空 SHM 位图
+        self.shm.write(b'\x00' * MAP_SIZE)
 
-        # 获取当前运行触发的所有索引
+        proc = subprocess.Popen(
+            [self.target_path],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=self.env
+        )
+
+        try:
+            # 喂入变异后的数据
+            stdout, stderr = proc.communicate(input=input_data, timeout=0.5)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.wait()
+            return set(), -1  # 超时视为无效执行
+
+        # 读取位图并找出被标记过的“边” (Edges)
         bitmap = self.shm.read(MAP_SIZE)
-        current_indices = set(i for i, b in enumerate(bitmap) if b > 0)
+        current_indices = set(i for i, byte in enumerate(bitmap) if byte > 0)
+
         return current_indices, proc.returncode
 
     def start(self):
-        print("[+] Fuzzer 启动！正在通过位图反馈进化...")
+        """主循环：Seed -> Mutate -> Run -> Feedback"""
+        print(f"[+] Fuzzing 启动！目标: {self.target_path}")
+        print(f"[+] 共享内存 ID: {self.shm.id} | 初始语料数: {len(self.corpus)}")
+        print("-" * 50)
+
         while True:
-            # 1. 挑选种子并变异
+            # 1. 选择种子
             seed = random.choice(self.corpus)
+
+            # 2. 变异
             candidate = self.mutate(seed)
 
-            # 2. 跑一遍程序
-            current_indices, ret = self.run_target(candidate)
+            # 3. 运行并获取反馈
+            current_indices, returncode = self.run_target(candidate)
             self.exec_count += 1
 
-            # 3. 【核心逻辑】只要发现了任何一个以前没见过的索引，就是新路径！
+            # 4. 评估覆盖率：是否发现了新的“边”
             if current_indices and not current_indices.issubset(self.global_visited_indices):
-                new_edges = current_indices - self.global_visited_indices
+                new_edges_count = len(current_indices - self.global_visited_indices)
                 self.global_visited_indices.update(current_indices)
                 self.corpus.append(candidate)
 
-                # 保存这个优秀的种子
-                with open(f"/app/seeds/id_{len(self.corpus)}", "wb") as f:
+                # 保存新发现的种子到硬盘
+                seed_id = len(self.corpus)
+                with open(os.path.join(SEED_DIR, f"id_{seed_id:06d}"), "wb") as f:
                     f.write(candidate)
 
-                print(f"\n[*] 发现新路径! 种子: {candidate} | 新增索引: {new_edges} | 语料库: {len(self.corpus)}")
+                print(
+                    f"\n[*] 发现新路径! 种子: {candidate[:20]!r}... | 新增边: {new_edges_count} | 总边数: {len(self.global_visited_indices)}")
 
-            # 4. 检查崩溃
-            if ret is not None and ret < 0:
-                print(f"\n[!!!] 捕获崩溃! 输入: {candidate}")
-                with open(f"/app/out/crash_{int(time.time())}.txt", "wb") as f:
+            # 5. 检查是否触发崩溃 (Crash)
+            # returncode < 0 捕捉 SIGSEGV 等信号，returncode == 66 捕捉我们手动设置的 exit(66)
+            if (returncode is not None and returncode < 0) or (returncode == 66):
+                print(f"\n\n{'!' * 20}")
+                print(f"[★] 捕获漏洞崩溃！")
+                print(f"[★] 触发输入: {candidate!r}")
+                print(f"{'!' * 20}\n")
+
+                if not os.path.exists(OUT_DIR): os.makedirs(OUT_DIR)
+                with open(os.path.join(OUT_DIR, f"crash_{int(time.time())}.txt"), "wb") as f:
                     f.write(candidate)
                 break
 
+            # 6. 打印统计信息
             if self.exec_count % 100 == 0:
-                speed = int(self.exec_count / (time.time() - self.start_time))
-                print(f" 执行数: {self.exec_count} | 速度: {speed}/s | 已发现边: {len(self.global_visited_indices)}",
-                      end='\r')
+                elapsed = time.time() - self.start_time
+                # 记录数据到 CSV
+                with open(self.stats_file, "a") as f:
+                    f.write(f"{elapsed:.2f},{self.exec_count},{len(self.global_visited_indices)}\n")
 
 
 if __name__ == "__main__":
-    if not os.path.exists("/app/out"): os.makedirs("/app/out")
     fuzzer = GreyBoxFuzzer(TARGET)
     try:
         fuzzer.start()
     except KeyboardInterrupt:
-        print("\n[+] 用户停止")
+        print("\n[+] 用户手动停止。")
     finally:
+        # 清理资源，防止内存泄露
+        print("[+] 正在清理共享内存...")
         fuzzer.shm.detach()
         fuzzer.shm.remove()
