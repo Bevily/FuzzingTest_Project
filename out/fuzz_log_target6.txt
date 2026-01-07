@@ -1,0 +1,22 @@
+[*] Loading seeds from: /app/FuzzingTest_Project/seeds
+[*] Fuzzing target: target6 | Timeout: 10s
+[+] New Path! Cov: 77 | Execs: 1 | Speed: 4.74 execs/s
+[*] Fuzzing test case #1 (stats: map=77, speed=5/s, crashes=0, paths=3)
+
+[!] 🚨 Found New Crash! Saved to id:000001,sig:timeout,src:000000,op:havoc,rep:1,hash:7d82adc8
+[+] New Path! Cov: 82 | Execs: 3 | Speed: 5.46 execs/s
+[*] Fuzzing test case #3 (stats: map=82, speed=5/s, crashes=1, paths=4)
+[*] Fuzzing test case #15 (stats: map=82, speed=9/s, crashes=1, paths=4)
+[*] Fuzzing test case #30 (stats: map=82, speed=11/s, crashes=1, paths=4)
+
+[!] 🚨 Found New Crash! Saved to id:000041,sig:timeout,src:000000,op:havoc,rep:1,hash:fcd6bcb5
+[*] Fuzzing test case #57 (stats: map=82, speed=15/s, crashes=2, paths=4)
+[*] Fuzzing test case #72 (stats: map=82, speed=15/s, crashes=2, paths=4)
+
+[!] 🚨 Found New Crash! Saved to id:000078,sig:timeout,src:000000,op:havoc,rep:1,hash:27b6651a
+[*] Fuzzing test case #81 (stats: map=82, speed=14/s, crashes=3, paths=4)
+[*] Fuzzing test case #96 (stats: map=82, speed=14/s, crashes=3, paths=4)
+[*] Fuzzing test case #110 (stats: map=82, speed=14/s, crashes=3, paths=4)
+
+[!] 🚨 Found New Crash! Saved to id:000115,sig:timeout,src:000000,op:havoc,rep:1,hash:38755e83
+[*] Fuzzing test case #122 (stats: map=82, speed=13/s, crashes=4, paths=4)

@@ -1,0 +1,45 @@
+[*] Loading seeds from: /app/FuzzingTest_Project/seeds
+[*] Fuzzing target: target3 | Timeout: 10s
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:fcd6bcb5
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:89391d29
+[+] New Path! Cov: 14 | Execs: 0 | Speed: 0.00 execs/s
+[*] Fuzzing test case #0 (stats: map=14, speed=0/s, crashes=2, paths=3)
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:cd7cb7be
+[+] New Path! Cov: 86 | Execs: 0 | Speed: 0.00 execs/s
+[*] Fuzzing test case #0 (stats: map=86, speed=0/s, crashes=3, paths=4)
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:c415c586
+[+] New Path! Cov: 95 | Execs: 0 | Speed: 0.00 execs/s
+[*] Fuzzing test case #0 (stats: map=95, speed=0/s, crashes=4, paths=5)
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:259e097e
+[+] New Path! Cov: 161 | Execs: 0 | Speed: 0.00 execs/s
+[*] Fuzzing test case #0 (stats: map=161, speed=0/s, crashes=5, paths=6)
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:b8c78310
+[*] Fuzzing test case #0 (stats: map=161, speed=0/s, crashes=6, paths=6)
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:b808bc03
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:0f516773
+[+] New Path! Cov: 219 | Execs: 1 | Speed: 0.29 execs/s
+[*] Fuzzing test case #1 (stats: map=219, speed=0/s, crashes=8, paths=7)
+[*] Fuzzing test case #2 (stats: map=219, speed=0/s, crashes=8, paths=7)
+
+[!] 🚨 Found New Crash! Saved to id:000002,sig:timeout,src:000000,op:havoc,rep:1,hash:b332f634
+[*] Fuzzing test case #2 (stats: map=219, speed=0/s, crashes=9, paths=7)
+[*] Fuzzing test case #3 (stats: map=219, speed=0/s, crashes=9, paths=7)
+
+[!] 🚨 Found New Crash! Saved to id:000003,sig:timeout,src:000000,op:havoc,rep:1,hash:a85ee770
+[*] Fuzzing test case #3 (stats: map=219, speed=0/s, crashes=10, paths=7)
+
+[!] 🚨 Found New Crash! Saved to id:000003,sig:timeout,src:000000,op:havoc,rep:1,hash:3b47ab44
+
+[!] 🚨 Found New Crash! Saved to id:000003,sig:timeout,src:000000,op:havoc,rep:1,hash:ca792dc1
+
+[!] 🚨 Found New Crash! Saved to id:000003,sig:timeout,src:000000,op:havoc,rep:1,hash:13c1bae2
+[*] Fuzzing test case #3 (stats: map=219, speed=0/s, crashes=13, paths=7)
+[*] Fuzzing test case #3 (stats: map=219, speed=0/s, crashes=13, paths=7)

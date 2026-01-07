@@ -1,0 +1,33 @@
+[*] Loading seeds from: /app/FuzzingTest_Project/seeds
+[*] Fuzzing target: target4 | Timeout: 10s
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:fcd6bcb5
+[*] Fuzzing test case #0 (stats: map=0, speed=0/s, crashes=1, paths=2)
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:01969444
+[+] New Path! Cov: 5 | Execs: 0 | Speed: 0.00 execs/s
+[*] Fuzzing test case #0 (stats: map=5, speed=0/s, crashes=2, paths=3)
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:2c43ebb7
+[+] New Path! Cov: 47 | Execs: 0 | Speed: 0.00 execs/s
+[*] Fuzzing test case #0 (stats: map=47, speed=0/s, crashes=3, paths=4)
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:b9664529
+[+] New Path! Cov: 116 | Execs: 0 | Speed: 0.00 execs/s
+[*] Fuzzing test case #0 (stats: map=116, speed=0/s, crashes=4, paths=5)
+[*] Fuzzing test case #0 (stats: map=116, speed=0/s, crashes=4, paths=5)
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:ca6cac89
+[+] New Path! Cov: 120 | Execs: 0 | Speed: 0.00 execs/s
+[*] Fuzzing test case #0 (stats: map=120, speed=0/s, crashes=5, paths=6)
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:15e388fd
+[*] Fuzzing test case #0 (stats: map=120, speed=0/s, crashes=6, paths=6)
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:b808bc03
+[*] Fuzzing test case #0 (stats: map=120, speed=0/s, crashes=7, paths=6)
+[*] Fuzzing test case #0 (stats: map=120, speed=0/s, crashes=7, paths=6)
+
+[!] 🚨 Found New Crash! Saved to id:000000,sig:timeout,src:000000,op:havoc,rep:1,hash:94604d4b
+[*] Fuzzing test case #0 (stats: map=120, speed=0/s, crashes=8, paths=6)
+[*] Fuzzing test case #0 (stats: map=120, speed=0/s, crashes=8, paths=6)
