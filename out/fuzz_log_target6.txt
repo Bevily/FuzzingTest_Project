@@ -1,22 +1,14 @@
-[*] Loading seeds from: /app/FuzzingTest_Project/seeds
+[*] Loading seeds from: /app/seeds
 [*] Fuzzing target: target6 | Timeout: 10s
-[+] New Path! Cov: 77 | Execs: 1 | Speed: 4.74 execs/s
+[+] New Path! Cov: 77 | Execs: 1 | Speed: 5.19 execs/s
 [*] Fuzzing test case #1 (stats: map=77, speed=5/s, crashes=0, paths=3)
-
-[!] 🚨 Found New Crash! Saved to id:000001,sig:timeout,src:000000,op:havoc,rep:1,hash:7d82adc8
-[+] New Path! Cov: 82 | Execs: 3 | Speed: 5.46 execs/s
-[*] Fuzzing test case #3 (stats: map=82, speed=5/s, crashes=1, paths=4)
-[*] Fuzzing test case #15 (stats: map=82, speed=9/s, crashes=1, paths=4)
-[*] Fuzzing test case #30 (stats: map=82, speed=11/s, crashes=1, paths=4)
-
-[!] 🚨 Found New Crash! Saved to id:000041,sig:timeout,src:000000,op:havoc,rep:1,hash:fcd6bcb5
-[*] Fuzzing test case #57 (stats: map=82, speed=15/s, crashes=2, paths=4)
-[*] Fuzzing test case #72 (stats: map=82, speed=15/s, crashes=2, paths=4)
-
-[!] 🚨 Found New Crash! Saved to id:000078,sig:timeout,src:000000,op:havoc,rep:1,hash:27b6651a
-[*] Fuzzing test case #81 (stats: map=82, speed=14/s, crashes=3, paths=4)
-[*] Fuzzing test case #96 (stats: map=82, speed=14/s, crashes=3, paths=4)
-[*] Fuzzing test case #110 (stats: map=82, speed=14/s, crashes=3, paths=4)
-
-[!] 🚨 Found New Crash! Saved to id:000115,sig:timeout,src:000000,op:havoc,rep:1,hash:38755e83
-[*] Fuzzing test case #122 (stats: map=82, speed=13/s, crashes=4, paths=4)
+[+] New Path! Cov: 82 | Execs: 23 | Speed: 21.26 execs/s
+[*] Fuzzing test case #23 (stats: map=82, speed=21/s, crashes=0, paths=4)
+[*] Fuzzing test case #80 (stats: map=82, speed=38/s, crashes=0, paths=4)
+[*] Fuzzing test case #129 (stats: map=82, speed=41/s, crashes=0, paths=4)
+[*] Fuzzing test case #171 (stats: map=82, speed=41/s, crashes=0, paths=4)
+[*] Fuzzing test case #199 (stats: map=82, speed=38/s, crashes=0, paths=4)
+[*] Fuzzing test case #229 (stats: map=82, speed=36/s, crashes=0, paths=4)
+[*] Fuzzing test case #251 (stats: map=82, speed=34/s, crashes=0, paths=4)
+[*] Fuzzing test case #268 (stats: map=82, speed=31/s, crashes=0, paths=4)
+[*] Fuzzing test case #298 (stats: map=82, speed=31/s, crashes=0, paths=4)
